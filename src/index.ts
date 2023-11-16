@@ -1,27 +1,45 @@
 import express from 'express'
 const app = express()
 app.use(express.json())
+
 import ListaFilme from './aplicacao/lista-filme.use-case'
 import BancoMongoDB from './infra/banco/banco-mongodb'
 const bancoMongoDB = new BancoMongoDB()
+import SalvaFilme from './aplicacao/salva-filme.use-case'
+
 app.get('/filmes',async (req,res)=>{
     //usem o listarFilme Usecase para listar os filmes
     const listaFilme = new ListaFilme(bancoMongoDB)
     const filmes = await listaFilme.executar()
     res.send(filmes)
 })
-app.post('/filmes',(req,res)=>{
+
+///////////////////////////////////
+app.post('/filmes', async (req, res)=>{
     const {id,titulo,descricao,imagem} = req.body
-    const filme = {
-        id,
-        titulo,
-        descricao,
-        imagem
-    }
-    //Como eu salvo o filme que foi cadastrado no meu vetor de filmes (Banco de dados)
-    filmesCadastros.push(filme)
-    res.status(201).send(filme)
+     const filme = {
+         id,
+         titulo,
+         descricao,
+         imagem
+     }
+    const SalvaFIlme = new SalvaFilme(bancoMongoDB)
+    const filmes = await SalvaFIlme.execute(filme)
+    res.send(filmes)
 })
+
+// app.post('/filmes',(req,res)=>{
+//     const {id,titulo,descricao,imagem} = req.body
+//     const filme = {
+//         id,
+//         titulo,
+//         descricao,
+//         imagem
+//     }
+//     //Como eu salvo o filme que foi cadastrado no meu vetor de filmes (Banco de dados)
+//     filmesCadastros.push(filme)
+//     res.status(201).send(filme)
+// })
 
 app.get('/filmes/:id',(req,res)=>{
     const id = parseInt(req.params.id)
